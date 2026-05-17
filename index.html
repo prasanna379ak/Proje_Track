@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engineering Project Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #f5f7f5;
+    --white: #ffffff;
+    --gray-light: #eef0ee;
+    --gray-mid: #d4d8d4;
+    --gray-dark: #6b7068;
+    --green-light: #d6ead6;
+    --green-mid: #8fbc8f;
+    --green-dark: #3a7a3a;
+    --green-accent: #4caf50;
+    --black: #1a1d1a;
+    --text: #2c2f2c;
+    --text-muted: #6b7068;
+    --border: #dde0dd;
+    --shadow: 0 1px 4px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--black);
+    color: var(--white);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--green-accent);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  header span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--green-mid);
+    background: rgba(76,175,80,0.12);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(76,175,80,0.25);
+  }
+
+  /* MAIN LAYOUT */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .stat-pill {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    box-shadow: var(--shadow);
+  }
+  .stat-pill strong {
+    color: var(--green-dark);
+    font-size: 1.1rem;
+    display: block;
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+  }
+
+  /* PART SECTION */
+  .part-section {
+    margin-bottom: 28px;
+  }
+  .part-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 10px;
+    padding-left: 4px;
+    border-left: 3px solid var(--green-accent);
+    padding-left: 8px;
+  }
+
+  /* PROJECT CARD */
+  .project-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .project-card:hover { box-shadow: var(--shadow-md); }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    cursor: pointer;
+    gap: 12px;
+    user-select: none;
+    background: var(--white);
+    transition: background 0.15s;
+  }
+  .card-header:hover { background: var(--gray-light); }
+
+  .project-index {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    min-width: 32px;
+  }
+
+  .project-title {
+    flex: 1;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 130px;
+  }
+  .progress-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--gray-light);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green-mid), var(--green-accent));
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+  .progress-pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--green-dark);
+    min-width: 28px;
+    text-align: right;
+  }
+
+  .chevron {
+    font-size: 0.8rem;
+    color: var(--gray-dark);
+    transition: transform 0.2s;
+    margin-left: 6px;
+  }
+  .card-header.open .chevron { transform: rotate(180deg); }
+
+  /* CARD BODY */
+  .card-body {
+    display: none;
+    padding: 0 18px 18px;
+    border-top: 1px solid var(--gray-light);
+  }
+  .card-body.open { display: block; }
+
+  /* STEPS */
+  .steps-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+    margin-bottom: 18px;
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gray-light);
+    border: 1px solid var(--gray-mid);
+    border-radius: 8px;
+    padding: 7px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    min-width: 150px;
+    flex: 1;
+  }
+  .step-item.done {
+    background: var(--green-light);
+    border-color: var(--green-mid);
+  }
+  .step-item input[type="checkbox"] {
+    accent-color: var(--green-accent);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .step-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .step-item.done .step-label {
+    color: var(--green-dark);
+  }
+
+  /* NOTES SECTION */
+  .notes-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .notes-area {
+    width: 100%;
+    min-height: 90px;
+    border: 1px solid var(--gray-mid);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.8rem;
+    color: var(--text);
+    background: var(--bg);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+    line-height: 1.6;
+  }
+  .notes-area:focus {
+    border-color: var(--green-accent);
+    background: var(--white);
+  }
+  .notes-area::placeholder { color: var(--gray-dark); }
+
+  .save-btn {
+    margin-top: 8px;
+    padding: 6px 16px;
+    background: var(--green-dark);
+    color: var(--white);
+    border: none;
+    border-radius: 6px;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    letter-spacing: 0.03em;
+  }
+  .save-btn:hover { background: var(--green-accent); }
+  .save-indicator {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 0.72rem;
+    color: var(--green-dark);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .save-indicator.show { opacity: 1; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 18px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    border-top: 1px solid var(--border);
+    background: var(--white);
+  }
+
+  @media (max-width: 640px) {
+    header { padding: 14px 16px; }
+    main { padding: 16px 12px 40px; }
+    .steps-grid { flex-direction: column; }
+    .step-item { min-width: unset; }
+    .progress-wrap { min-width: 90px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ Engineering Project Tracker</h1>
+  <span id="headerProgress">0 / 14 Done</span>
+</header>
+
+<main>
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-pill"><strong id="totalDone">0</strong>Projects Complete</div>
+    <div class="stat-pill"><strong id="totalSteps">0</strong>Steps Cleared</div>
+    <div class="stat-pill"><strong id="totalPct">0%</strong>Overall Progress</div>
+  </div>
+
+  <div id="projectList"></div>
+</main>
+
+<footer>
+  Data saved to browser localStorage · Deploy on GitHub Pages · All progress auto-saved
+</footer>
+
+<script>
+const PROJECTS = [
+  {
+    part: "PART 1 — Digital Design & Verification",
+    items: [
+      "Design and Verification of TinyML Edge AI Accelerator with AXI Interface",
+      "Design and Verification of Low-Power 4-bit Pipelined ALU with Ripple Carry Adder"
+    ]
+  },
+  {
+    part: "PART 2 — Analog & Mixed-Signal Design",
+    items: [
+      "Mixed-Signal 10-bit Successive Approximation Register (SAR) ADC with On-Chip Reference",
+      "Design and Layout of Folded-Cascode CMOS Operational Amplifier in 130nm Technology"
+    ]
+  },
+  {
+    part: "PART 3 — RF & Radar Systems",
+    items: [
+      "Radar Receiver Front-End Design for Pulse-Doppler Target Detection System"
+    ]
+  },
+  {
+    part: "PART 4 — Embedded, FPGA & IoT",
+    items: [
+      "IoT-Based Smart Weather Monitoring System",
+      "CNN Edge Inference Accelerator (VLSI Architecture Study)",
+      "UART Communication Module on FPGA"
+    ]
+  },
+  {
+    part: "PART 5 — Advanced Defence & SoC Systems",
+    items: [
+      "AI-Accelerated Radar Target Tracking ASIC for Hypersonic Missile Interception",
+      "Secure Swarm Communication SoC for Autonomous Defence Drones",
+      "Simple Morse Code Detector on FPGA"
+    ]
+  }
+];
+
+const STEPS = [
+  { key: "literature", label: "📚 Literature Review" },
+  { key: "coding",     label: "💻 Project Coding" },
+  { key: "run",        label: "✅ Run Success" },
+  { key: "impl",       label: "🔧 Implementation" },
+  { key: "done",       label: "🎯 Project Done Final" }
+];
+
+function getKey(partIdx, itemIdx, field) {
+  return `proj_${partIdx}_${itemIdx}_${field}`;
+}
+
+function loadData(key) {
+  try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
+}
+
+function saveData(key, val) {
+  localStorage.setItem(key, JSON.stringify(val));
+}
+
+function calcProgress(partIdx, itemIdx) {
+  let done = 0;
+  STEPS.forEach(s => {
+    if (loadData(getKey(partIdx, itemIdx, s.key))) done++;
+  });
+  return done;
+}
+
+function updateStats() {
+  let totalProjects = 0, projectsDone = 0, totalSteps = 0, maxSteps = 0;
+  PROJECTS.forEach((part, pi) => {
+    part.items.forEach((_, ii) => {
+      totalProjects++;
+      const done = calcProgress(pi, ii);
+      if (done === 5) projectsDone++;
+      totalSteps += done;
+      maxSteps += 5;
+    });
+  });
+  document.getElementById('totalDone').textContent = projectsDone;
+  document.getElementById('totalSteps').textContent = totalSteps;
+  document.getElementById('totalPct').textContent = Math.round((totalSteps / maxSteps) * 100) + '%';
+  document.getElementById('headerProgress').textContent = `${projectsDone} / ${totalProjects} Done`;
+}
+
+function updateCardProgress(partIdx, itemIdx) {
+  const done = calcProgress(partIdx, itemIdx);
+  const pct = Math.round((done / 5) * 100);
+  const fill = document.getElementById(`fill_${partIdx}_${itemIdx}`);
+  const pctEl = document.getElementById(`pct_${partIdx}_${itemIdx}`);
+  if (fill) fill.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+}
+
+let globalProjIdx = 0;
+
+function buildUI() {
+  const container = document.getElementById('projectList');
+  globalProjIdx = 0;
+
+  PROJECTS.forEach((part, pi) => {
+    const section = document.createElement('div');
+    section.className = 'part-section';
+
+    const label = document.createElement('div');
+    label.className = 'part-label';
+    label.textContent = part.part;
+    section.appendChild(label);
+
+    part.items.forEach((title, ii) => {
+      const idx = ++globalProjIdx;
+      const card = document.createElement('div');
+      card.className = 'project-card';
+
+      const donePct = Math.round((calcProgress(pi, ii) / 5) * 100);
+
+      // Header
+      const header = document.createElement('div');
+      header.className = 'card-header';
+      header.innerHTML = `
+        <span class="project-index">#${String(idx).padStart(2,'0')}</span>
+        <span class="project-title">${title}</span>
+        <div class="progress-wrap">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="fill_${pi}_${ii}" style="width:${donePct}%"></div>
+          </div>
+          <span class="progress-pct" id="pct_${pi}_${ii}">${donePct}%</span>
+        </div>
+        <span class="chevron">▾</span>
+      `;
+
+      // Body
+      const body = document.createElement('div');
+      body.className = 'card-body';
+
+      // Steps
+      const stepsGrid = document.createElement('div');
+      stepsGrid.className = 'steps-grid';
+
+      STEPS.forEach(step => {
+        const key = getKey(pi, ii, step.key);
+        const checked = !!loadData(key);
+        const item = document.createElement('label');
+        item.className = 'step-item' + (checked ? ' done' : '');
+        item.innerHTML = `
+          <input type="checkbox" ${checked ? 'checked' : ''}>
+          <span class="step-label">${step.label}</span>
+        `;
+        item.querySelector('input').addEventListener('change', function() {
+          saveData(key, this.checked);
+          item.classList.toggle('done', this.checked);
+          updateCardProgress(pi, ii);
+          updateStats();
+        });
+        stepsGrid.appendChild(item);
+      });
+
+      body.appendChild(stepsGrid);
+
+      // Notes
+      const notesLabel = document.createElement('div');
+      notesLabel.className = 'notes-label';
+      notesLabel.textContent = '🗒 Notes — Problems & Steps';
+      body.appendChild(notesLabel);
+
+      const notesKey = getKey(pi, ii, 'notes');
+      const savedNotes = loadData(notesKey) || '';
+      const textarea = document.createElement('textarea');
+      textarea.className = 'notes-area';
+      textarea.placeholder = '• Write problems you faced...\n• Steps you followed...\n• Tools / references used...\n• Pending issues...';
+      textarea.value = savedNotes;
+
+      const btnRow = document.createElement('div');
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'save-btn';
+      saveBtn.textContent = 'Save Notes';
+      const saveInd = document.createElement('span');
+      saveInd.className = 'save-indicator';
+      saveInd.textContent = '✓ Saved';
+      btnRow.appendChild(saveBtn);
+      btnRow.appendChild(saveInd);
+
+      saveBtn.addEventListener('click', () => {
+        saveData(notesKey, textarea.value);
+        saveInd.classList.add('show');
+        setTimeout(() => saveInd.classList.remove('show'), 1800);
+      });
+
+      // Auto-save on typing (debounced)
+      let debounce;
+      textarea.addEventListener('input', () => {
+        clearTimeout(debounce);
+        debounce = setTimeout(() => {
+          saveData(notesKey, textarea.value);
+          saveInd.classList.add('show');
+          setTimeout(() => saveInd.classList.remove('show'), 1200);
+        }, 1000);
+      });
+
+      body.appendChild(textarea);
+      body.appendChild(btnRow);
+
+      // Toggle
+      header.addEventListener('click', () => {
+        const isOpen = body.classList.contains('open');
+        body.classList.toggle('open', !isOpen);
+        header.classList.toggle('open', !isOpen);
+      });
+
+      card.appendChild(header);
+      card.appendChild(body);
+      section.appendChild(card);
+    });
+
+    container.appendChild(section);
+  });
+
+  updateStats();
+}
+
+buildUI();
+</script>
+</body>
+</html>
