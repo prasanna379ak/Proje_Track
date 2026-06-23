@@ -1,5 +1,5 @@
 {
-  "p0_i0_literature": true,
+  "p0_i0_literature": false,
   "p0_i0_coding": true,
   "p0_i0_run": true,
   "p0_i0_impl": true,
