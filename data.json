@@ -64,5 +64,10 @@
   "p4_i2_run": true,
   "p4_i2_impl": true,
   "p4_i2_done": true,
-  "p4_i2_notes": "Done - Git Upload Remaining___"
+  "p4_i2_notes": "Done - Git Upload Remaining___",
+  "p6_i0_coding": true,
+  "p6_i0_run": true,
+  "p6_i0_impl": true,
+  "p6_i0_done": true,
+  "p6_i0_notes": "Done - Git Upload Remaining___"
 }
