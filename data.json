@@ -60,9 +60,9 @@
   "p4_i1_done": true,
   "p4_i1_notes": "Done - Git Upload Remaining___",
   "p4_i2_literature": false,
-  "p4_i2_coding": false,
-  "p4_i2_run": false,
-  "p4_i2_impl": false,
-  "p4_i2_done": false,
+  "p4_i2_coding": true,
+  "p4_i2_run": true,
+  "p4_i2_impl": true,
+  "p4_i2_done": true,
   "p4_i2_notes": ""
 }
